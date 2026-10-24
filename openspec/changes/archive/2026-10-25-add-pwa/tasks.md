@@ -15,4 +15,4 @@
 
 ## 4. Deployed check
 
-- [ ] 4.1 After the deploy, verify the live `/whatismykey/` serves the manifest, icons and service worker with status 200, and document in `README.md` how to add the app to the home screen on iPhone and Android.
+- [x] 4.1 After the deploy, verify the live `/whatismykey/` serves the manifest, icons and service worker with status 200, and document in `README.md` how to add the app to the home screen on iPhone and Android.
