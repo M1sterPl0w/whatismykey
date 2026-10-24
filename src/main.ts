@@ -4,7 +4,9 @@ import { applyCapo, Chord, Quality } from './chord';
 import { detectKeys } from './key';
 import { fretboardSvg } from './fretboard';
 import { ScaleId, scalesForKey } from './scales';
-import { chordLabel, keyRows, QUALITIES, ROOTS } from './view';
+import type { Recording } from './listen';
+import { recogniseChords } from './recognise';
+import { chordLabel, formatTime, heardToShapes, keyRows, listenErrorMessage, QUALITIES, ROOTS } from './view';
 
 interface State {
   chords: Chord[];
@@ -17,6 +19,7 @@ interface State {
   /** Set when a new version is waiting; calling it reloads into that version. */
   applyUpdate: (() => void) | null;
   zoomed: boolean;
+  listen: { status: 'idle' | 'preparing' | 'recording' | 'analysing'; message: string };
 }
 
 const state: State = {
@@ -28,13 +31,37 @@ const state: State = {
   selectedScale: null,
   applyUpdate: null,
   zoomed: false,
+  listen: { status: 'idle', message: '' },
 };
+
+let recording: Recording | null = null;
+let clock: number | undefined;
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
 function resetResults(): void {
   state.selectedKey = 0;
   state.selectedScale = null;
+}
+
+function listenSection(): string {
+  const { status, message } = state.listen;
+  const button =
+    status === 'recording'
+      ? '<button class="primary listen" data-action="stop">Stop</button>'
+      : `<button class="listen" data-action="listen" ${status === 'idle' ? '' : 'disabled'}>Listen</button>`;
+  const info =
+    status === 'recording'
+      ? `<span class="listen-info" role="status">Listening… <span id="listen-time">${formatTime(recording?.elapsed() ?? 0)}</span></span>`
+      : status === 'preparing'
+        ? '<span class="listen-info" role="status">Getting ready…</span>'
+        : status === 'analysing'
+          ? '<span class="listen-info" role="status">Analysing…</span>'
+          : '';
+  return `
+    <div class="label">Listen to a song</div>
+    <div class="row listen-row">${button}${info}</div>
+    ${message ? `<p class="notice" role="alert">${message}</p>` : ''}`;
 }
 
 function chordSection(): string {
@@ -64,6 +91,7 @@ function chordSection(): string {
   return `
     <div class="label">Song chords</div>
     <div class="row chord-list">${list}</div>
+    ${listenSection()}
     <div class="label">Root</div>
     <div class="roots">${roots}</div>
     <div class="label">Type</div>
@@ -138,6 +166,48 @@ function render(): void {
   app.innerHTML = `${updateBar()}<h1>WhatIsMyKey</h1>${chordSection()}${resultsSection()}`;
 }
 
+async function startListening(): Promise<void> {
+  state.listen = { status: 'preparing', message: '' };
+  render();
+  try {
+    const { startRecording } = await import('./listen');
+    recording = await startRecording(() => void stopListening());
+  } catch (error) {
+    state.listen = { status: 'idle', message: listenErrorMessage(error) };
+    render();
+    return;
+  }
+  state.listen = { status: 'recording', message: '' };
+  render();
+  clock = window.setInterval(() => {
+    const time = document.getElementById('listen-time');
+    if (time && recording) time.textContent = formatTime(recording.elapsed());
+  }, 250);
+}
+
+async function stopListening(): Promise<void> {
+  if (!recording || state.listen.status !== 'recording') return;
+  const finished = recording;
+  recording = null;
+  window.clearInterval(clock);
+  state.listen = { status: 'analysing', message: '' };
+  render();
+  try {
+    const { analyse } = await import('./listen');
+    const heard = recogniseChords(await analyse(await finished.stop()));
+    if (heard.length === 0) {
+      state.listen = { status: 'idle', message: 'No chords were heard. Try again closer to the sound.' };
+    } else {
+      state.chords.push(...heardToShapes(heard.map((h) => h.chord), state.capo));
+      resetResults();
+      state.listen = { status: 'idle', message: '' };
+    }
+  } catch {
+    state.listen = { status: 'idle', message: 'Could not analyse the recording.' };
+  }
+  render();
+}
+
 app.addEventListener('click', (event) => {
   const button = (event.target as HTMLElement).closest<HTMLElement>('[data-action]');
   if (!button) return;
@@ -172,6 +242,12 @@ app.addEventListener('click', (event) => {
       state.selectedKey = Number(data.index);
       state.selectedScale = null;
       break;
+    case 'listen':
+      void startListening();
+      return;
+    case 'stop':
+      void stopListening();
+      return;
     case 'zoom':
       state.zoomed = true;
       break;
