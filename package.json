@@ -16,5 +16,9 @@
     "vite": "^6.0.0",
     "vite-plugin-pwa": "^2.0.0",
     "vitest": "^2.1.0"
+  },
+  "dependencies": {
+    "@spotify/basic-pitch": "^1.0.1",
+    "@tensorflow/tfjs": "^4.22.0"
   }
 }

@@ -290,3 +290,12 @@ button:disabled {
     transform-origin: 0 0;
   }
 }
+
+.listen-row {
+  align-items: center;
+}
+
+.listen-info {
+  font-size: 14px;
+  color: var(--muted);
+}

@@ -11,6 +11,10 @@ Live: https://m1sterpl0w.github.io/whatismykey/
 
 When a new version is deployed, a "A new version is ready" bar appears. Tap Reload to switch to it.
 
+## Listen to a song
+
+Tap **Listen**, let the phone hear the song or your guitar, then tap **Stop**. The heard chords are added to the end of the chord list (lowered by the capo fret, so the list keeps showing shapes). Remove the wrong ones with the × buttons. Only major, minor and 7 chords are recognised, and a full band recording gives many wrong chords, so check the list. The recording is analysed on the phone, never uploaded, and it works offline after the first visit. The first Listen downloads about 2.7 MB of extra code and model, which the app then keeps.
+
 ## Development
 
 ```
