@@ -16,6 +16,7 @@ interface State {
   selectedScale: ScaleId | null;
   /** Set when a new version is waiting; calling it reloads into that version. */
   applyUpdate: (() => void) | null;
+  zoomed: boolean;
 }
 
 const state: State = {
@@ -26,6 +27,7 @@ const state: State = {
   selectedKey: 0,
   selectedScale: null,
   applyUpdate: null,
+  zoomed: false,
 };
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
@@ -74,6 +76,13 @@ function chordSection(): string {
     <div class="row">${capo}</div>`;
 }
 
+function zoomOverlay(notes: string[]): string {
+  return `<div class="zoom">
+    <div class="zoom-bar"><button class="primary" data-action="unzoom">Close</button></div>
+    ${fretboardSvg(notes, 'upright')}
+  </div>`;
+}
+
 function resultsSection(): string {
   if (state.chords.length === 0) {
     return '<p class="empty">Add the chords of a song to see its key and scales.</p>';
@@ -112,7 +121,11 @@ function resultsSection(): string {
     <div class="label">Scale</div>
     <div class="row">${chips}</div>
     <div class="notes">${scale.notes.join(' ')}</div>
-    ${fretboardSvg(scale.notes)}`;
+    <div class="board" data-action="zoom" role="button" tabindex="0" aria-label="Enlarge fretboard">
+      ${fretboardSvg(scale.notes)}
+      <div class="hint">Tap to enlarge</div>
+    </div>
+    ${state.zoomed ? zoomOverlay(scale.notes) : ''}`;
 }
 
 function updateBar(): string {
@@ -126,7 +139,7 @@ function render(): void {
 }
 
 app.addEventListener('click', (event) => {
-  const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-action]');
+  const button = (event.target as HTMLElement).closest<HTMLElement>('[data-action]');
   if (!button) return;
   const data = button.dataset;
 
@@ -148,6 +161,7 @@ app.addEventListener('click', (event) => {
       break;
     case 'clear':
       state.chords = [];
+      state.capo = 0;
       resetResults();
       break;
     case 'capo':
@@ -158,6 +172,12 @@ app.addEventListener('click', (event) => {
       state.selectedKey = Number(data.index);
       state.selectedScale = null;
       break;
+    case 'zoom':
+      state.zoomed = true;
+      break;
+    case 'unzoom':
+      state.zoomed = false;
+      break;
     case 'update':
       state.applyUpdate?.();
       return;
@@ -166,6 +186,14 @@ app.addEventListener('click', (event) => {
       break;
   }
   render();
+});
+
+app.addEventListener('keydown', (event) => {
+  const target = event.target as HTMLElement;
+  if ((event.key === 'Enter' || event.key === ' ') && target.matches('.board')) {
+    event.preventDefault();
+    target.click();
+  }
 });
 
 render();

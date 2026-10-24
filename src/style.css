@@ -226,3 +226,41 @@ button:disabled {
   border-left: 3px solid var(--accent);
   font-size: 14px;
 }
+
+.board {
+  cursor: zoom-in;
+}
+
+.hint {
+  margin-top: 4px;
+  font-size: 12px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.zoom {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow-y: auto;
+  background: var(--bg);
+}
+
+.zoom-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 16px;
+}
+
+.zoom .fretboard {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.fretboard.upright .fb-mark {
+  font-size: 14px;
+}
+
+.fretboard.upright .fb-label {
+  font-size: 14px;
+}
