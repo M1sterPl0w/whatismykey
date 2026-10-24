@@ -79,7 +79,7 @@ function chordSection(): string {
 function zoomOverlay(notes: string[]): string {
   return `<div class="zoom">
     <div class="zoom-bar"><button class="primary" data-action="unzoom">Close</button></div>
-    ${fretboardSvg(notes, 'upright')}
+    <div class="zoom-board"><div class="zoom-turn">${fretboardSvg(notes)}</div></div>
   </div>`;
 }
 
