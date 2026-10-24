@@ -68,4 +68,31 @@ describe('recogniseChords', () => {
   it('returns an empty list when there are no notes', () => {
     expect(recogniseChords([])).toEqual([]);
   });
+
+  describe('overtones of a minor chord', () => {
+    const Am = [45, 52, 57, 60, 64];
+    const A = [45, 52, 57, 61, 64];
+    const B = [47, 54, 59, 63, 66];
+    const Bm = [47, 54, 59, 62, 66];
+
+    it('gives one minor chord when its major follows', () => {
+      expect(heard([...sound(Am, 0, 1.5), ...sound(A, 1.5, 2.5)])).toEqual(['Am']);
+    });
+
+    it('gives one minor chord when its major comes first', () => {
+      expect(heard([...sound(B, 0, 1), ...sound(Bm, 1, 2.5)])).toEqual(['Bm']);
+    });
+
+    it('keeps a major chord that stands alone', () => {
+      expect(heard(sound(A, 0, 2))).toEqual(['A']);
+    });
+
+    it('does not merge chords on different roots', () => {
+      expect(heard([...sound(Am, 0, 1.5), ...sound([46, 53, 58, 62, 65], 1.5, 3)])).toEqual(['Am', 'A#']);
+    });
+
+    it('still reports other changes after the merged chord', () => {
+      expect(heard([...sound(Am, 0, 1.5), ...sound(A, 1.5, 2.5), ...sound(VOICING.G, 2.5, 4.5)])).toEqual(['Am', 'G']);
+    });
+  });
 });

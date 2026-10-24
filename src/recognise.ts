@@ -88,6 +88,13 @@ function majority(labels: number[], centre: number): number {
   return winner;
 }
 
+const isThirdOnly = (quality: Quality) => quality === 'major' || quality === 'minor';
+
+/** Same chord, or the major and minor of one root that overtones can confuse. */
+function sameChord(a: Chord, b: Chord): boolean {
+  return a.quality === b.quality || (isThirdOnly(a.quality) && isThirdOnly(b.quality));
+}
+
 /** Turns the notes found in a recording into the major, minor and 7 chords played, in time order. */
 export function recogniseChords(notes: NoteEvent[]): TimedChord[] {
   const labels = frameProfiles(notes).map(bestChord);
@@ -107,8 +114,11 @@ export function recogniseChords(notes: NoteEvent[]): TimedChord[] {
     const start = run.first * FRAME_SECONDS;
     const end = (run.last + 1) * FRAME_SECONDS;
     const previous = result[result.length - 1];
-    if (previous && previous.chord.root === chord.root && previous.chord.quality === chord.quality) {
+    if (previous && previous.chord.root === chord.root && sameChord(previous.chord, chord)) {
       previous.end = end;
+      // A ringing minor chord's overtones look like its major (the fifth overtone of the root is
+      // the major third), but a major chord never looks minor, so a minor reading wins.
+      if (chord.quality === 'minor') previous.chord.quality = 'minor';
     } else {
       result.push({ chord: { ...chord }, start, end });
     }

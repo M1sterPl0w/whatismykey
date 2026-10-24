@@ -39,6 +39,25 @@ The system SHALL report a chord only when it is the best match for at least 0.4 
 - **WHEN** an `F#` chord matches for 0.1 seconds between two `G` chords
 - **THEN** the result is a single `G`
 
+### Requirement: Do not mistake overtones for a major chord
+The system SHALL report one minor chord when a major chord and a minor chord on the same root follow each other directly, because the overtones of a ringing minor chord (the fifth overtone of the root is the major third) can look like the major chord. The reverse SHALL NOT happen.
+
+#### Scenario: Minor followed by its major
+- **WHEN** the notes of `Am` sound for 1.5 seconds and then the notes A, C#, E sound for 1 second
+- **THEN** the result is the single chord `Am`
+
+#### Scenario: Major followed by its minor
+- **WHEN** the notes of `B` sound for 1 second and then the notes of `Bm` sound for 1.5 seconds
+- **THEN** the result is the single chord `Bm`
+
+#### Scenario: Major chord alone stays major
+- **WHEN** only the notes A, C#, E sound for 2 seconds
+- **THEN** the result is the chord `A`
+
+#### Scenario: Different roots are not merged
+- **WHEN** the notes of `Am` sound and then the notes of `A#` sound
+- **THEN** both chords are reported
+
 ### Requirement: Stay silent on silence
 The system SHALL report no chord for time with fewer than two different note names sounding, and SHALL return an empty list when no chord is found.
 
