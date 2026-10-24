@@ -1,4 +1,5 @@
 import './style.css';
+import { registerSW } from 'virtual:pwa-register';
 import { applyCapo, Chord, Quality } from './chord';
 import { detectKeys } from './key';
 import { fretboardSvg } from './fretboard';
@@ -13,6 +14,8 @@ interface State {
   selectedKey: number;
   /** null means the key's own scale. */
   selectedScale: ScaleId | null;
+  /** Set when a new version is waiting; calling it reloads into that version. */
+  applyUpdate: (() => void) | null;
 }
 
 const state: State = {
@@ -22,6 +25,7 @@ const state: State = {
   pendingQuality: 'major',
   selectedKey: 0,
   selectedScale: null,
+  applyUpdate: null,
 };
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
@@ -111,8 +115,14 @@ function resultsSection(): string {
     ${fretboardSvg(scale.notes)}`;
 }
 
+function updateBar(): string {
+  return state.applyUpdate
+    ? '<div class="update" role="status"><span>A new version is ready.</span><button class="primary" data-action="update">Reload</button></div>'
+    : '';
+}
+
 function render(): void {
-  app.innerHTML = `<h1>WhatIsMyKey</h1>${chordSection()}${resultsSection()}`;
+  app.innerHTML = `${updateBar()}<h1>WhatIsMyKey</h1>${chordSection()}${resultsSection()}`;
 }
 
 app.addEventListener('click', (event) => {
@@ -148,6 +158,9 @@ app.addEventListener('click', (event) => {
       state.selectedKey = Number(data.index);
       state.selectedScale = null;
       break;
+    case 'update':
+      state.applyUpdate?.();
+      return;
     case 'scale':
       state.selectedScale = data.id as ScaleId;
       break;
@@ -156,3 +169,10 @@ app.addEventListener('click', (event) => {
 });
 
 render();
+
+const updateSW = registerSW({
+  onNeedRefresh() {
+    state.applyUpdate = () => void updateSW(true);
+    render();
+  },
+});

@@ -214,3 +214,15 @@ button:disabled {
   font-size: 10px;
   text-anchor: middle;
 }
+
+.update {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: var(--card);
+  border-left: 3px solid var(--accent);
+  font-size: 14px;
+}
