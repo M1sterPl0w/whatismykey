@@ -24,7 +24,7 @@ The app SHALL show the notes of the selected scale in order, starting at the roo
 - **THEN** the notes shown are `A B C# D E F# G#`
 
 ### Requirement: Show a fretboard
-The app SHALL draw a fretboard for standard tuning with six strings and frets 0 to 12. Each note of the selected scale SHALL be marked and labelled with its name, with the root in a different colour from the other notes. The notes SHALL be the sounding notes, with the capo not drawn.
+The app SHALL draw a fretboard for standard tuning with six strings and frets 0 to 12, as seen when looking down at a guitar neck: the nut on the left, the frets running to the right, the low E string on top and the high e string at the bottom. Each note of the selected scale SHALL be marked and labelled with its name, with the root in a different colour from the other notes. The notes SHALL be the sounding notes, with the capo not drawn.
 
 #### Scenario: Root highlighted
 - **WHEN** A major is selected
@@ -38,15 +38,27 @@ The app SHALL draw a fretboard for standard tuning with six strings and frets 0 
 - **WHEN** the fretboard is shown
 - **THEN** each string has its open note name and the frets 3, 5, 7, 9 and 12 are marked
 
+#### Scenario: String order
+- **WHEN** the fretboard is shown
+- **THEN** the strings from top to bottom are E, A, D, G, B, e
+
 ### Requirement: Enlarge the fretboard
-The app SHALL open the fretboard full screen when the user taps it, drawn upright with the six strings vertical and the nut at the top, and SHALL return to the normal screen when the user taps a close button. The full-screen view SHALL show the same notes, labels and root colour as the normal fretboard.
+The app SHALL open the fretboard full screen when the user taps it, drawn lengthwise like the normal fretboard (nut on the left, low E on top) and filling the long side of the screen, and SHALL return to the normal screen when the user taps a close button. In portrait the picture SHALL be turned a quarter turn so its length runs along the long side of the screen. In landscape it SHALL be shown unturned. The full-screen view SHALL show the same notes, labels and root colour as the normal fretboard.
 
 #### Scenario: Open full screen
 - **WHEN** the user taps the fretboard
-- **THEN** a full-screen view shows the upright fretboard for the selected scale, with a close button
+- **THEN** a full-screen view shows the fretboard for the selected scale, with a close button
+
+#### Scenario: Landscape
+- **WHEN** the full-screen view is open on a screen wider than it is tall
+- **THEN** the fretboard is not turned and its length fills the screen width
+
+#### Scenario: Portrait
+- **WHEN** the full-screen view is open on a screen taller than it is wide
+- **THEN** the fretboard is turned a quarter turn and its length fills the screen height
 
 #### Scenario: Larger marks
-- **WHEN** the full-screen view is open on a 360 px wide screen
+- **WHEN** the full-screen view is open on a 360 by 740 px screen
 - **THEN** each note mark is at least 28 px across and its label is at least 12 px tall
 
 #### Scenario: Same notes
