@@ -3,6 +3,7 @@
 ## 1. Chord recognition
 
 - [x] 1.1 Add `src/recognise.ts` with a pure function from note events (start, end, pitch, strength) to chords (frame profile, template match for major, minor and 7, median smoothing, 0.4 s minimum, repeats merged) and `src/recognise.test.ts` covering every `chord-recognition` scenario; verify `npm test` passes.
+- [x] 1.2 Merge a major and a minor chord on the same root that follow each other directly into the minor chord (a ringing minor chord's overtones look like its major), with tests for the four overtone scenarios; verify `npm test` passes and that `Am` followed by `A` and `Bm` followed by `B` each give one minor chord.
 
 ## 2. Model in the browser
 
