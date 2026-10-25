@@ -14,8 +14,8 @@
 ## 3. Tuner screen
 
 - [x] 3.1 Extract shared microphone and worklet setup from `src/listen.ts` and add a live streaming mode for the tuner; verify Listen tests and behaviour are unchanged
-- [ ] 3.2 Build the Tuner screen: Start/Stop, tuning picker, string list with auto target and tap-to-lock, note name, Hz, cents, needle (±50 cents), in-tune state, waiting state, microphone error messages; update dynamic parts without a full render; verify view tests for text states and string/needle helpers, and manual check on a phone with a real guitar
-- [ ] 3.3 Stop the microphone when leaving the Tuner screen or hiding the page, and disable Listen/Tuner start while the other runs; verify by test of the state transitions and a manual check that the browser mic indicator goes off
+- [x] 3.2 Build the Tuner screen: Start/Stop, tuning picker, string list with auto target and tap-to-lock, note name, Hz, cents, needle (±50 cents), in-tune state, waiting state, microphone error messages; update dynamic parts without a full render; verify view tests for text states and string/needle helpers, and manual check on a phone with a real guitar
+- [x] 3.3 Stop the microphone when leaving the Tuner screen or hiding the page, and disable Listen/Tuner start while the other runs; verify by test of the state transitions and a manual check that the browser mic indicator goes off
 
 ## 4. Chord grips
 
@@ -25,9 +25,9 @@
 
 ## 5. Chords screen
 
-- [ ] 5.1 Build the Chords screen: root and type pickers (reuse `ROOTS` and `QUALITIES`), chord name, hint when nothing is picked, list of grip diagrams, and an Add to song button that appends to `state.chords`; verify view tests and that the Key screen shows the added chord
+- [x] 5.1 Build the Chords screen: root and type pickers (reuse `ROOTS` and `QUALITIES`), chord name, hint when nothing is picked, list of grip diagrams, and an Add to song button that appends to `state.chords`; verify view tests and that the Key screen shows the added chord
 
 ## 6. Integration
 
 - [x] 6.1 Update `README.md` for the three screens; verify the README matches the app
-- [ ] 6.2 Run `npm test` and `npm run build`, then check offline: load once, go offline, confirm all three screens work; verify in the browser dev tools network panel
+- [x] 6.2 Run `npm test` and `npm run build`, then check offline: load once, go offline, confirm all three screens work; verify in the browser dev tools network panel
