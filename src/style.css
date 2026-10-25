@@ -299,3 +299,157 @@ button:disabled {
   font-size: 14px;
   color: var(--muted);
 }
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin: 8px 0 4px;
+}
+
+.tabs button {
+  min-height: 44px;
+}
+
+.strings .string {
+  flex: 1;
+  font-weight: 600;
+}
+
+.strings .string.target {
+  outline: 2px solid var(--accent);
+}
+
+.tuner-readout {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.tuner-note {
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--accent);
+}
+
+.dial {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.dial-tick {
+  stroke: var(--board-line);
+  stroke-width: 1.5;
+}
+
+.dial-centre {
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+
+.dial-needle {
+  stroke: var(--text);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transform-origin: 100px 105px;
+  transition: transform 0.12s ease-out;
+}
+
+.dial-hub {
+  fill: var(--text);
+}
+
+.tuner-state {
+  margin-top: 4px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.tuner-state[data-state='in tune'] {
+  color: var(--accent);
+}
+
+.tuner-detail {
+  min-height: 1.4em;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.chord-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.chord-name {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.grips {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.grip {
+  margin: 0;
+  padding: 8px;
+  background: var(--card);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.grip figcaption {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+}
+
+.grip figcaption span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.chord-diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.chord-diagram .fb-string,
+.chord-diagram .fb-fret {
+  stroke-width: 1;
+}
+
+.chord-diagram .fb-nut {
+  stroke-width: 3;
+}
+
+.cd-barre {
+  fill: var(--note);
+  opacity: 0.35;
+}
+
+.cd-open {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 1.5;
+}
+
+.cd-mute {
+  fill: var(--muted);
+  font-size: 12px;
+  text-anchor: middle;
+}
+
+.cd-fret {
+  fill: var(--muted);
+  font-size: 11px;
+  text-anchor: middle;
+}

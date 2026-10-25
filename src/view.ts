@@ -1,6 +1,7 @@
 import { Chord, formatChord } from './chord';
 import { KeyDetection } from './key';
 import { Key, keyName, mod12 } from './notes';
+import { NEEDLE_RANGE_CENTS } from './tunings';
 
 export const ROOTS = [
   { label: 'C', pc: 0 },
@@ -70,4 +71,37 @@ export function listenErrorMessage(error: unknown): string {
   }
   if (name === 'NotSupportedError' || error instanceof TypeError) return "This browser can't record audio.";
   return 'Could not start listening.';
+}
+
+export type Screen = 'key' | 'tuner' | 'chords';
+
+export const SCREENS: { screen: Screen; label: string }[] = [
+  { screen: 'key', label: 'Key' },
+  { screen: 'tuner', label: 'Tuner' },
+  { screen: 'chords', label: 'Chords' },
+];
+
+/** The row of navigation buttons; the button of the current screen is pressed. */
+export function tabsHtml(current: Screen): string {
+  const buttons = SCREENS.map(
+    ({ screen, label }) =>
+      `<button data-action="screen" data-screen="${screen}" aria-pressed="${screen === current}"${screen === current ? ' aria-current="page"' : ''}>${label}</button>`,
+  ).join('');
+  return `<nav class="tabs" aria-label="Screens">${buttons}</nav>`;
+}
+
+/** Dial for the tuner; the needle (`#tuner-needle`) is turned by the page, a tick every 10 cents. */
+export function needleSvg(): string {
+  const ticks: string[] = [];
+  for (let cents = -NEEDLE_RANGE_CENTS; cents <= NEEDLE_RANGE_CENTS; cents += 10) {
+    const centre = cents === 0;
+    ticks.push(
+      `<line class="${centre ? 'dial-centre' : 'dial-tick'}" x1="100" y1="${centre ? 18 : 24}" x2="100" y2="34" transform="rotate(${(cents / NEEDLE_RANGE_CENTS) * 45} 100 105)"/>`,
+    );
+  }
+  return `<svg class="dial" viewBox="0 0 200 120" role="img" aria-label="Tuning needle">
+    ${ticks.join('')}
+    <line id="tuner-needle" class="dial-needle" x1="100" y1="105" x2="100" y2="30" style="transform:rotate(0deg)"/>
+    <circle class="dial-hub" cx="100" cy="105" r="6"/>
+  </svg>`;
 }

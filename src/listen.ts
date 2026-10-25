@@ -1,4 +1,5 @@
 import { addPitchBendsToNoteEvents, BasicPitch, noteFramesToTime, outputToNotesPoly } from '@spotify/basic-pitch';
+import { openMicrophone } from './capture';
 import type { NoteEvent } from './recognise';
 
 /** The model only accepts mono audio at this rate. */
@@ -55,18 +56,6 @@ export interface Recording {
   stop(): Promise<Float32Array>;
 }
 
-// Runs on the audio thread and hands each block of microphone samples to the page.
-const CAPTURE_WORKLET = `
-class Capture extends AudioWorkletProcessor {
-  process(inputs) {
-    const channel = inputs[0][0];
-    if (channel) this.port.postMessage(channel.slice(0));
-    return true;
-  }
-}
-registerProcessor('capture', Capture);
-`;
-
 async function resample(samples: Float32Array, fromRate: number): Promise<Float32Array> {
   if (fromRate === MODEL_SAMPLE_RATE) return samples;
   const length = Math.ceil((samples.length * MODEL_SAMPLE_RATE) / fromRate);
@@ -85,41 +74,21 @@ async function resample(samples: Float32Array, fromRate: number): Promise<Float3
  * denied or there is no microphone. `onLimit` runs when the recording reaches `maxSeconds`.
  */
 export async function startRecording(onLimit: () => void, maxSeconds = MAX_RECORD_SECONDS): Promise<Recording> {
-  // Music is distorted by the filters meant for speech, so they are switched off.
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false },
-  });
-  const context = new AudioContext();
-  const workletUrl = URL.createObjectURL(new Blob([CAPTURE_WORKLET], { type: 'application/javascript' }));
   const chunks: Float32Array[] = [];
   let total = 0;
+  const microphone = await openMicrophone((block) => {
+    chunks.push(block);
+    total += block.length;
+  });
 
-  try {
-    await context.audioWorklet.addModule(workletUrl);
-    const node = new AudioWorkletNode(context, 'capture');
-    node.port.onmessage = (event: MessageEvent<Float32Array>) => {
-      chunks.push(event.data);
-      total += event.data.length;
-    };
-    context.createMediaStreamSource(stream).connect(node);
-    await context.resume();
-  } catch (error) {
-    stream.getTracks().forEach((track) => track.stop());
-    void context.close();
-    throw error;
-  } finally {
-    URL.revokeObjectURL(workletUrl);
-  }
-
-  const rate = context.sampleRate;
+  const rate = microphone.sampleRate;
   const timer = setTimeout(onLimit, maxSeconds * 1000);
 
   return {
     elapsed: () => total / rate,
     async stop() {
       clearTimeout(timer);
-      stream.getTracks().forEach((track) => track.stop());
-      await context.close();
+      await microphone.stop();
       const samples = new Float32Array(total);
       let offset = 0;
       for (const chunk of chunks) {
