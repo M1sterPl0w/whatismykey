@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Chord, parseChord } from './chord';
 import { detectKeys } from './key';
-import { chordLabel, formatTime, heardToShapes, keyRows, listenErrorMessage } from './view';
+import { chordLabel, formatTime, heardToShapes, keyRows, listenErrorMessage, needleSvg, tabsHtml } from './view';
 
 function parseAll(...symbols: string[]): Chord[] {
   return symbols.map((symbol) => {
@@ -77,5 +77,28 @@ describe('listenErrorMessage', () => {
 
   it('has a fallback', () => {
     expect(listenErrorMessage(named('Weird'))).toBe('Could not start listening.');
+  });
+});
+
+describe('tabsHtml', () => {
+  const pressed = (html: string) =>
+    [...html.matchAll(/data-screen="(\w+)" aria-pressed="true"/g)].map((match) => match[1]);
+
+  it('shows three buttons: Key, Tuner and Chords', () => {
+    const html = tabsHtml('key');
+    expect([...html.matchAll(/data-screen="(\w+)"/g)].map((m) => m[1])).toEqual(['key', 'tuner', 'chords']);
+    expect(html).toMatch(/>Key<.*>Tuner<.*>Chords</);
+  });
+
+  it.each(['key', 'tuner', 'chords'] as const)('marks only %s as selected', (screen) => {
+    expect(pressed(tabsHtml(screen))).toEqual([screen]);
+  });
+});
+
+describe('needleSvg', () => {
+  it('has a needle and a centre tick', () => {
+    const svg = needleSvg();
+    expect(svg).toContain('id="tuner-needle"');
+    expect(svg).toContain('dial-centre');
   });
 });

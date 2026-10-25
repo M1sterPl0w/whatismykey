@@ -47,7 +47,7 @@ describe('theme colour', () => {
 describe('service worker', () => {
   it('is built and registered by the app', () => {
     expect(existsSync(dist('sw.js'))).toBe(true);
-    const bundle = readdirSync(dist('assets')).find((file) => file.endsWith('.js'))!;
+    const bundle = readdirSync(dist('assets')).find((file) => file.startsWith('index-') && file.endsWith('.js'))!;
     expect(readFileSync(dist(`assets/${bundle}`), 'utf8')).toContain('sw.js');
   });
 });
